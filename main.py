@@ -92,21 +92,18 @@ def rename(file, folder):
 
     for file in files:
 
-        file_name = files[i].split('.')[0]
-        file_format = files[i].split('.')[1]
+        file_name = file.split('.')[0]
+        file_format = file.split('.')[1]
         print(file_name)
         print(file_format)
 
-        old_name = file_content['nome_atual'].tolist()[i]
-        new_name = file_content['novo_nome'].tolist()[i]
-
-        print(old_name)
-        print(new_name)
+        # old_name = file_content['nome_atual'].tolist()
+        # new_name = file_content['novo_nome'].tolist()
 
         if file_name == old_name:
             os.rename(file, f"{file.split('.')[0]}".file_format.replace(old_name, new_name))
         else:
-            print("Arquivo " + str(old_name)[i] + " nao encontrado!")
+            print("Arquivo " + str(old_name) + " nao encontrado!")
 
 
 
