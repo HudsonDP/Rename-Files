@@ -89,19 +89,31 @@ def rename(file, folder):
     files = os.listdir(folder)
     print(file_content)
     print(files)
+
     for file in files:
-        file_id = file_content['ID'].tolist()
-        old_name = file_content['nome_atual'].tolist()
-        new_name = file_content['novo_nome'].tolist()
+
+        file_name = files[i].split('.')[0]
+        file_format = files[i].split('.')[1]
+        print(file_name)
+        print(file_format)
+
+        old_name = file_content['nome_atual'].tolist()[i]
+        new_name = file_content['novo_nome'].tolist()[i]
+
+        print(old_name)
+        print(new_name)
+
+        if file_name == old_name:
+            os.rename(file, f"{file.split('.')[0]}".file_format.replace(old_name, new_name))
+        else:
+            print("Arquivo " + str(old_name)[i] + " nao encontrado!")
+
 
 
         # if files[i] == old_name:
         #     os.rename(old_name, new_name)
         # else:
         #     print("Arquivo" + old_name + "nao encontrado")
-
-
-
 
     # try:
     #     planilha = file
