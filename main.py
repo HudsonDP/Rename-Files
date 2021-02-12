@@ -9,12 +9,12 @@ import shutil
 def create_window():
     file_list_column = [
         [
-            sg.Text("Selecione o Diretório:         "),
+            sg.Text("Selecione o Diretório de Origem: "),
             sg.In(size=(25, 1), enable_events=True, key="-FOLDER-"),
             sg.FolderBrowse(),
         ],
         [
-            sg.Text("Selecione o Arquivo Matriz: "),
+            sg.Text("Selecione o Arquivo Matriz:        "),
             sg.In(size=(25, 1), enable_events=True, key="-FILE-"),
             sg.FileBrowse(),
         ],
@@ -24,7 +24,7 @@ def create_window():
             )
         ],
         [
-            sg.Button("Rename"),
+            sg.Button("Rename")
 
         ],
         [
@@ -69,7 +69,6 @@ def create_window():
                 filename = os.path.join(
                     values["-FOLDER-"], values["-FILE LIST-"][0]
                 )
-
             except:
                 pass
 
@@ -77,6 +76,7 @@ def create_window():
             file = values["-FILE-"]
 
         if event == "Rename":
+
             try:
                 backup(folder)
                 try:
@@ -95,10 +95,10 @@ def create_window():
 def rename(file, folder):
     file_content = pd.read_excel(file)
     files = os.listdir(folder)
-    files_count = len(files)
-    print(files_count)
+
     print(files)
     print(file_content)
+
     i = 0
     for file in files:
 
@@ -128,7 +128,7 @@ def backup(folder):
     try:
         destino_backup = ('./Backup')
         if os.path.exists(destino_backup):
-            sg.PopupOK("Ja existe uma pasta backup. Certifique-se de verificar se é seguro exclui-la!")
+            sg.Popup("Já existe uma pasta backup. Favor verificar o conteúdo antes de remove-la, em sequida tente novamente!")
         else:
             shutil.copytree(str(folder), str(destino_backup))
             sg.PopupOK("Backup Criado")
