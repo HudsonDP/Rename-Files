@@ -3,6 +3,7 @@ import os.path
 import os
 import re
 import pandas as pd
+import shutil
 
 
 def create_window():
@@ -13,7 +14,7 @@ def create_window():
             sg.FolderBrowse(),
         ],
         [
-            sg.Text("Selecione o arquivo matriz: "),
+            sg.Text("Selecione o Arquivo Matriz: "),
             sg.In(size=(25, 1), enable_events=True, key="-FILE-"),
             sg.FileBrowse(),
         ],
@@ -59,7 +60,8 @@ def create_window():
                 f
                 for f in file_list
                 if os.path.isfile(os.path.join(folder, f))
-                   and f.lower().endswith((".pdf", ".xls", ".xlsx", ".doc", ".docx", ".txt", ".png", ".jpg"))
+                   and f.lower().endswith(
+                    (".rar", ".pdf", ".xls", ".xlsx", ".doc", ".docx", ".txt", ".png", ".jpg", ".bmp"))
             ]
             window["-FILE LIST-"].update(fnames)
         elif event == "-FILE LIST-":  # A file was chosen from the listbox
@@ -67,7 +69,6 @@ def create_window():
                 filename = os.path.join(
                     values["-FOLDER-"], values["-FILE LIST-"][0]
                 )
-                window["-TOUT-"].update(filename)
 
             except:
                 pass
@@ -76,69 +77,65 @@ def create_window():
             file = values["-FILE-"]
 
         if event == "Rename":
-            rename(file, folder)
+            try:
+                backup(folder)
+                try:
+                    rename(file, folder)
+                    sg.PopupOK('Arquivos Renomeados com Sucesso!')
+                except ValueError as err:
+                    error_rename = "Erro ao Renomear: " + str(err)
+                    sg.PopupError(error_rename)
+            except ValueError as err:
+                error_backup = "Erro ao criar backup: " + str(err)
+                sg.PopupError(error_backup)
 
     window.close()
 
 
 def rename(file, folder):
-    print("entrou na função")
-    print("file :" + file)
-    print("folder: " + folder)
     file_content = pd.read_excel(file)
     files = os.listdir(folder)
-    print(file_content)
+    files_count = len(files)
+    print(files_count)
     print(files)
-
+    print(file_content)
+    i = 0
     for file in files:
 
         file_name = file.split('.')[0]
         file_format = file.split('.')[1]
-        print(file_name)
-        print(file_format)
 
-        # old_name = file_content['nome_atual'].tolist()
-        # new_name = file_content['novo_nome'].tolist()
+        old_name = file_content['nome_atual'].tolist()[i] + '.' + str(file_format)
+        new_name = file_content['novo_nome'].tolist()[i] + '.' + str(file_format)
 
-        if file_name == old_name:
-            os.rename(file, f"{file.split('.')[0]}".file_format.replace(old_name, new_name))
+        if str(file) == str(old_name):
+            if not os.path.exists('./Renomeados'):
+                os.mkdir('./Renomeados')
+
+            destino = './Renomeados'
+
+            old_name = os.path.join(folder, old_name)
+            new_name = os.path.join(destino, new_name)
+            os.rename(old_name, new_name)
+            i += 1
+
         else:
             print("Arquivo " + str(old_name) + " nao encontrado!")
+            i += 1
 
 
+def backup(folder):
+    try:
+        destino_backup = ('./Backup')
+        if os.path.exists(destino_backup):
+            sg.PopupOK("Ja existe uma pasta backup. Certifique-se de verificar se é seguro exclui-la!")
+        else:
+            shutil.copytree(str(folder), str(destino_backup))
+            sg.PopupOK("Backup Criado")
 
-        # if files[i] == old_name:
-        #     os.rename(old_name, new_name)
-        # else:
-        #     print("Arquivo" + old_name + "nao encontrado")
-
-    # try:
-    #     planilha = file
-    #     newPlanilha = (planilha[planilha['NOME ATUAL'] == int(numero)].head())
-    #     nome = newPlanilha.values.tolist()
-    #     print(nome[0][1])
-    #     novo_nome = nome[0][1] + '.pdf'
-    #     return novo_nome
-    # except:
-    #     return False
-    #
-    # # Cria o diretório.(Caso não exista.)
-    # if not os.path.exists('./Renomeados'):
-    #     os.mkdir('./Renomeados')
-    #
-    # # Navega pelo diretorio dos arquivos PDF's.
-    # # Deixa o arquivo com numeros apenas.
-    # for _, _, documento in os.walk(folder):
-    #     for documento2 in documento:
-    #         documento3 = re.sub('-', '', str(documento2))
-    #         number = lerplanilha(re.sub('[^0-9]', ' ', documento3))
-    #         print(f'Nome Antigo:' + str(documento2))
-    #         print(f'Novo Nome:' + str(number))
-    #         if number:
-    #             os.rename(r'Y:/GIOVANNA MORETI/ACORDOS 27.01/' + str(documento2),
-    #                       r'Y:/Daniella/renomear/Renomeados/' + str(number))
-    #         else:
-    #             print('Não foi possivel renomear o arquivo: ' + documento2)
+    except ValueError as err:
+        error_backup_mkdir = "Erro ao criar pasta BACKUP: " + str(err)
+        sg.PopupError(error_backup_mkdir)
 
 
 if __name__ == '__main__':
