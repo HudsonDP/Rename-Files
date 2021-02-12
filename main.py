@@ -9,6 +9,10 @@ import shutil
 def create_window():
     file_list_column = [
         [
+            sg.Button("Baixar Planilha Matriz")
+
+        ],
+        [
             sg.Text("Selecione o Diretório de Origem: "),
             sg.In(size=(25, 1), enable_events=True, key="-FOLDER-"),
             sg.FolderBrowse(),
@@ -28,7 +32,7 @@ def create_window():
 
         ],
         [
-            sg.Button("Cancel")
+            sg.Button(" Cancel ")
         ],
     ]
 
@@ -74,6 +78,10 @@ def create_window():
 
         if event == "-FILE-":
             file = values["-FILE-"]
+
+        if event == "Baixar Planilha Matriz":
+            cria_matriz()
+            sg.PopupOK("Arquivo Matriz Criado.")
 
         if event == "Rename":
 
@@ -128,7 +136,8 @@ def backup(folder):
     try:
         destino_backup = ('./Backup')
         if os.path.exists(destino_backup):
-            sg.Popup("Já existe uma pasta backup. Favor verificar o conteúdo antes de remove-la, em sequida tente novamente!")
+            sg.Popup(
+                "Já existe uma pasta backup. Favor verificar o conteúdo antes de remove-la, em sequida tente novamente!")
         else:
             shutil.copytree(str(folder), str(destino_backup))
             sg.PopupOK("Backup Criado")
@@ -136,6 +145,10 @@ def backup(folder):
     except ValueError as err:
         error_backup_mkdir = "Erro ao criar pasta BACKUP: " + str(err)
         sg.PopupError(error_backup_mkdir)
+
+
+def cria_matriz():
+    matriz = pd.DataFrame({})
 
 
 if __name__ == '__main__':
