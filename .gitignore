@@ -1,6 +1,7 @@
 #pasta de arquivos
-./Backup
-./Renomeados
+Backup/
+Renomeados/
+.idea
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

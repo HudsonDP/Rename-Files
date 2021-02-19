@@ -1,9 +1,11 @@
+from pathlib import PurePosixPath
 import PySimpleGUI as sg
 import os.path
 import os
 import re
 import pandas as pd
 import shutil
+
 
 
 def create_window():
@@ -84,7 +86,6 @@ def create_window():
             sg.PopupOK("Arquivo Matriz Criado.")
 
         if event == "Rename":
-
             try:
                 backup(folder)
                 try:
@@ -110,21 +111,24 @@ def rename(file, folder):
     i = 0
     for file in files:
 
-        file_name = file.split('.')[0]
-        file_format = file.suffix
+        file_format = PurePosixPath(file).suffix
+        file_name = file.split(str(file_format))[0]
 
         print("file name: " + str(file_name))
         print("file format: " + str(file_format))
 
-        old_name = file_content['nome_atual'].tolist()[i] + '.' + str(file_format)
-        new_name = file_content['novo_nome'].tolist()[i] + '.' + str(file_format)
+        old_name = file_content['nome_atual'].tolist()[i]
+        new_name = file_content['novo_nome'].tolist()[i] + str(file_format)
 
-        if str(file) == str(old_name):
-            if not os.path.exists(folder + '/Renomeados'):
-                os.mkdir(folder + '/Renomeados')
+        print("File: " + str(file))
+        print("Old Name: " + str(old_name))
+        print("New Name: " + str(new_name))
 
+        if not os.path.exists(folder + '/Renomeados'):
+            os.mkdir(folder + '/Renomeados')
             destino = folder + '/Renomeados'
 
+        if str(file) == str(old_name):
             old_name = os.path.join(folder, old_name)
             new_name = os.path.join(destino, new_name)
             os.rename(old_name, new_name)
@@ -135,7 +139,7 @@ def rename(file, folder):
 
 def backup(folder):
     try:
-        destino_backup = (folder + '/Backup')
+        destino_backup = ('./Backup')
         if os.path.exists(destino_backup):
             sg.Popup(
                 "Já existe uma pasta backup. Favor verificar o conteúdo antes de remove-la, em sequida tente novamente!")
@@ -149,21 +153,30 @@ def backup(folder):
 
 
 def create_matriz(folder):
-    linhas_planilha = []
-    files = os.listdir(folder)
-    for file in files:
-        linha = {}
-        file_name = file.split('.')[0]
-        arquivo = str(file_name).replace('[','')
-        arquivo = str(file_name).replace(']','')
-        linha['nome_atual'] = str(arquivo)
-        linha['novo_nome'] = '[INSIRA O NOME NOVO]'
+    try:
+        linhas_planilha = []
+        files = os.listdir(folder)
+        for file in files:
+            linha = {}
+            # file_format = PurePosixPath(file).suffix
+            # file_name = file.split(file_format)
+            # print("file:" + str(file))
+            # print("file name:" + str(file_name))
+            # arquivo = str(file_name).replace('[','')
+            # arquivo = str(file_name).replace(']','')
+            linha['nome_atual'] = str(file)
+            linha['novo_nome'] = '[INSIRA O NOME NOVO]'
 
-        linhas_planilha.append(linha)
-
-        data = pd.DataFrame(linhas_planilha)
-
-        data.to_excel('Matriz.xlsx', index=False)
+            linhas_planilha.append(linha)
+            try:
+                data = pd.DataFrame(linhas_planilha)
+                data.to_excel('Matriz.xlsx', index=False)
+            except ValueError as err:
+                error_matriz = "Erro ao salvar Matriz: " + str(err)
+                sg.PopupError(error_matriz)
+    except ValueError as err:
+        error_matriz = "Erro ao Criar Matriz: " + str(err)
+        sg.PopupError(error_matriz)
 
 
 if __name__ == '__main__':
