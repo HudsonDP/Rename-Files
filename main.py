@@ -1,11 +1,10 @@
 from pathlib import PurePosixPath
+from datetime import datetime
 import PySimpleGUI as sg
 import os.path
 import os
-import re
 import pandas as pd
 import shutil
-
 
 
 def create_window():
@@ -90,7 +89,7 @@ def create_window():
                 backup(folder)
                 try:
                     rename(file, folder)
-                    sg.PopupOK('Arquivos Renomeados com Sucesso!')
+                    sg.PopupOK('Processo concluido: Verifique a pasta indicada!')
                 except ValueError as err:
                     error_rename = "Erro ao Renomear: " + str(err)
                     sg.PopupError(error_rename)
@@ -105,24 +104,14 @@ def rename(file, folder):
     file_content = pd.read_excel(file)
     files = os.listdir(folder)
 
-    print(files)
-    print(file_content)
-
     i = 0
     for file in files:
 
         file_format = PurePosixPath(file).suffix
         file_name = file.split(str(file_format))[0]
 
-        print("file name: " + str(file_name))
-        print("file format: " + str(file_format))
-
         old_name = file_content['nome_atual'].tolist()[i]
         new_name = file_content['novo_nome'].tolist()[i] + str(file_format)
-
-        print("File: " + str(file))
-        print("Old Name: " + str(old_name))
-        print("New Name: " + str(new_name))
 
         if not os.path.exists(folder + '/Renomeados'):
             os.mkdir(folder + '/Renomeados')
@@ -134,12 +123,17 @@ def rename(file, folder):
             os.rename(old_name, new_name)
             i += 1
         else:
-            sg.PopupError("Arquivo " + str(old_name) + " nao encontrado!")
-            i += 1
+            sg.PopupError("A lista de arquivos da planilha nao coincide com a pasta indicada!")
+            break
+
 
 def backup(folder):
+
+    date_time = datetime.now()
+    date_string = date_time.strftime('%d-%m-%Y %H-%M-%s')
+
     try:
-        destino_backup = ('./Backup')
+        destino_backup = ('./Backup' + '-' + str(date_string))
         if os.path.exists(destino_backup):
             sg.Popup(
                 "Já existe uma pasta backup. Favor verificar o conteúdo antes de remove-la, em sequida tente novamente!")
@@ -158,12 +152,6 @@ def create_matriz(folder):
         files = os.listdir(folder)
         for file in files:
             linha = {}
-            # file_format = PurePosixPath(file).suffix
-            # file_name = file.split(file_format)
-            # print("file:" + str(file))
-            # print("file name:" + str(file_name))
-            # arquivo = str(file_name).replace('[','')
-            # arquivo = str(file_name).replace(']','')
             linha['nome_atual'] = str(file)
             linha['novo_nome'] = '[INSIRA O NOME NOVO]'
 
