@@ -5,6 +5,8 @@ import os.path
 import os
 import pandas as pd
 import shutil
+import os
+from natsort import natsort
 
 
 def create_window():
@@ -56,7 +58,7 @@ def create_window():
 
             try:
                 # Get list of files in folder
-                file_list = os.listdir(folder)
+                file_list = natsort(os.listdir(folder))
 
             except:
                 file_list = []
@@ -102,7 +104,7 @@ def create_window():
 
 def rename(file, folder):
     file_content = pd.read_excel(file)
-    files = os.listdir(folder)
+    files = natsort(os.listdir(folder))
 
     i = 0
     for file in files:
@@ -128,9 +130,8 @@ def rename(file, folder):
 
 
 def backup(folder):
-
     date_time = datetime.now()
-    date_string = date_time.strftime('%d-%m-%Y %H-%M-%s')
+    date_string = date_time.strftime('%d-%m-%Y %H-%M')
 
     try:
         destino_backup = ('./Backup' + '-' + str(date_string))
@@ -149,10 +150,13 @@ def backup(folder):
 def create_matriz(folder):
     try:
         linhas_planilha = []
-        files = os.listdir(folder)
+        files = natsort(os.listdir(folder))
+
         for file in files:
             linha = {}
-            linha['nome_atual'] = str(file)
+
+            linha['nome_atual'] = file
+            linha['nome_atual 2'] = str(file.split("-")[0])
             linha['novo_nome'] = '[INSIRA O NOME NOVO]'
 
             linhas_planilha.append(linha)
